@@ -21,6 +21,5 @@ buildGoModule rec {
     description = "A Trojan proxy written in Go.";
     homepage = src.meta.homepage;
     license = licenses.gpl3;
-    maintainers = with maintainers; [ kkkykin ];
   };
 }
