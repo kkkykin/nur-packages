@@ -8,7 +8,7 @@ buildGoModule rec {
   pname = "trojan-go";
   version = "20240307.0";
   # Maybe the checkPhase cannot pass because of network issues.
-  doCheck = false;
+  # doCheck = false;
   src = fetchFromGitHub ({
     owner = "fregie";
     repo = "trojan-go";
