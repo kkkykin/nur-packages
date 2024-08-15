@@ -1,10 +1,14 @@
 { fetchFromGitHub
+, system
 , buildGoModule
 , lib
 , v2ray-geoip
 , v2ray-domain-list-community
 }:
 
+# let
+#   package_name = "github.com/p4gefau1t/trojan-go";
+# in
 buildGoModule rec {
   pname = "trojan-go";
   version = "20240307.0";
@@ -16,28 +20,51 @@ buildGoModule rec {
   });
   vendorHash = "sha256-cQil3OMjzQR9RjqA/vMDl21Gt00PVtzkNrp7BjYyLxI=";
 
+  # NIX_DEBUG=7;
+  # CGO_ENABLED = "0";
+  # ldflags = [
+  #   "-s"
+  #   "-w"
+  #   "-X ${package_name}/constant.Version=${version}"
+  #   "-X ${package_name}/constant.Commit=${src.rev}"
+  # ];
+  # GOFLAGS = [ "-trimpath" ];
+  # tags = "full";
+
+  prePatch = ''
+    sed -i \
+      -e s/^linux-arm:/aarch64-linux:/ \
+      -e s/^linux-amd64:/x86_64-linux:/ \
+      -e s/^darwin-amd64:/x86_64-darwin:/ \
+      -e s/^darwin-arm64:/aarch64-darwin:/ \
+      Makefile
+  '';
   buildPhase = ''
     runHook preBuild
-    mkdir -p build
-    env CGO_ENABLED=0 go build -tags "full" -trimpath \
- -ldflags="-s -w -buildid= -X github.com/p4gefau1t/trojan-go/constant.Version=${version} -X github.com/p4gefau1t/trojan-go/constant.Commit=${src.rev}" \
- -o build
+    make ${system} VERSION=${version} COMMIT=${src.rev}
     runHook postBuild
   '';
+  doCheck = false;
   installPhase = ''
     runHook preInstall
-    mkdir -p $out/{bin,etc}
-    cp example/*.json $out/etc/
-    cp build/trojan-go $out/bin/
+    sed -i \
+      -e s#/usr/share/trojan-go/geoip.dat#${v2ray-geoip}/share/v2ray/geoip.dat# \
+      -e s#/usr/share/trojan-go/geosite.dat#${v2ray-domain-list-community}/share/v2ray/geosite.dat# \
+      example/*.json
+    install -D -m444 -t $out/etc/ example/*.json
+    install -D -t $out/bin/ build/${system}/trojan-go
     runHook postInstall
   '';
-  # Maybe the checkPhase cannot pass because of network issues.
-  doCheck = false;
+
+   buildInputs = [
+     v2ray-geoip
+     v2ray-domain-list-community
+   ];
 
   meta = with lib; {
     description = "A Trojan proxy written in Go.";
     homepage = src.meta.homepage;
     license = licenses.gpl3;
-    platforms = [ "x86_64-linux" ];
+    platforms = lib.platforms.linux ++ lib.platforms.darwin;
   };
 }
