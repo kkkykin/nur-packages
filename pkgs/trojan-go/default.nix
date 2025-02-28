@@ -45,21 +45,19 @@ buildGoModule rec {
     runHook postBuild
   '';
   doCheck = false;
+
+  buildInputs = [
+    v2ray-geoip
+    v2ray-domain-list-community
+  ];
   installPhase = ''
     runHook preInstall
-    sed -i \
-      -e s#/usr/share/trojan-go/geoip.dat#${v2ray-geoip}/share/v2ray/geoip.dat# \
-      -e s#/usr/share/trojan-go/geosite.dat#${v2ray-domain-list-community}/share/v2ray/geosite.dat# \
-      example/*.json
-    install -D -m444 -t $out/etc/ example/*.json
+    mkdir -p "$out/bin"
+    ln -s "${v2ray-domain-list-community}/share/v2ray/geosite.dat" "$out/bin/geosite.dat"
+    ln -s "${v2ray-geoip}/share/v2ray/geoip.dat" "$out/bin/geoip.dat"
     install -D -t $out/bin/ build/${system}/trojan-go
     runHook postInstall
   '';
-
-   buildInputs = [
-     v2ray-geoip
-     v2ray-domain-list-community
-   ];
 
   meta = with lib; {
     description = "A Trojan proxy written in Go.";
