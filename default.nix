@@ -16,6 +16,7 @@
   overlays = import ./overlays; # nixpkgs overlays
 
   snow-ai = pkgs.callPackage ./pkgs/snow-ai { };
+  uni-api = pkgs.callPackage ./pkgs/uni-api { };
   # example-package = pkgs.callPackage ./pkgs/example-package { };
   # some-qt5-package = pkgs.libsForQt5.callPackage ./pkgs/some-qt5-package { };
   # ...
