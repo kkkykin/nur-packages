@@ -2,6 +2,7 @@
 , buildNpmPackage
 , fetchFromGitHub
 , nodejs
+, makeWrapper
 }:
 
 buildNpmPackage rec {
@@ -17,6 +18,8 @@ buildNpmPackage rec {
 
   npmDepsHash = "sha256-VI/HOGfDZD6QnarqUZOa50CjdDTPKY0JtAyElGLCRH4=";
 
+  nativeBuildInputs = [ makeWrapper ];
+
   buildPhase = ''
     npm run build
   '';
@@ -27,12 +30,8 @@ buildNpmPackage rec {
     cp -r scripts $out/lib/snow-ai/
     cp package.json $out/lib/snow-ai/
 
-    cat > $out/bin/snow <<EOF
-    #!${nodejs}/bin/node
-    import('$out/lib/snow-ai/bundle/cli.mjs');
-    EOF
-
-    chmod +x $out/bin/snow
+    makeWrapper ${nodejs}/bin/node $out/bin/snow \
+      --add-flags "$out/lib/snow-ai/bundle/cli.mjs"
   '';
 
   meta = with lib; {
