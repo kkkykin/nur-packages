@@ -3,7 +3,6 @@
 , fetchFromGitHub
 , cmake
 , gnumake
-, makeWrapper
 , enableUasm ? false
 , uasm ? null
 }:
@@ -23,7 +22,6 @@ stdenv.mkDerivation (finalAttrs: {
   nativeBuildInputs = [
     cmake
     gnumake
-    makeWrapper
   ] ++ lib.optional enableUasm (assert uasm != null; uasm);
 
   dontConfigure = true;
