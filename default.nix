@@ -17,6 +17,11 @@
 
   snow-ai = pkgs.callPackage ./pkgs/snow-ai { };
   uni-api = pkgs.callPackage ./pkgs/uni-api { };
+  c7zip = pkgs.callPackage ./pkgs/c7zip { };
+  c7zip-unfree = pkgs.callPackage ./pkgs/c7zip {
+    enableUasm = true;
+    uasm = pkgs.uasm;
+  };
   # axonhub = pkgs.callPackage ./pkgs/axonhub { };
   # example-package = pkgs.callPackage ./pkgs/example-package { };
   # some-qt5-package = pkgs.libsForQt5.callPackage ./pkgs/some-qt5-package { };
