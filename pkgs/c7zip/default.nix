@@ -16,7 +16,7 @@ stdenv.mkDerivation (finalAttrs: {
     repo = "p7zip";
     rev = finalAttrs.version;
     fetchSubmodules = true;
-    hash = "sha256-aEyYkW11iag6ETqT3zwO1UDKJWPdsqrHgGHqTOeAn5s=";
+    hash = "sha256-0z0hbl1tF2uq7fMrORw+7LX1OnMEWhoMleD2NFq7tWk=";
   };
 
   nativeBuildInputs = [
