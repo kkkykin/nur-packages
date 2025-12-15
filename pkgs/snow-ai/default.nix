@@ -7,16 +7,16 @@
 
 buildNpmPackage rec {
   pname = "snow-ai";
-  version = "0.4.33";
+  version = "0.5.5";
 
   src = fetchFromGitHub {
     owner = "MayDay-wpf";
     repo = "snow-cli";
     rev = "v${version}";
-    hash = "sha256-k9ht8qDP2MZsjI40J3at0du0LXeiOorUA/htS/IUshw=";
+    sha256 = "0h7w47kd5j0xhs8b3n7hlycg9j0r2q0qpzlkxdy70bkjy79f90qz";
   };
 
-  npmDepsHash = "sha256-VI/HOGfDZD6QnarqUZOa50CjdDTPKY0JtAyElGLCRH4=";
+  npmDepsHash = "sha256-8UPFCxaL+Ea5+Wzzt/v+dg4rUjdbeN+zTElQ8XXNQZw=";
 
   nativeBuildInputs = [ makeWrapper ];
 

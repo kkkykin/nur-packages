@@ -16,8 +16,8 @@
   overlays = import ./overlays; # nixpkgs overlays
 
   snow-ai = pkgs.callPackage ./pkgs/snow-ai { };
-  uni-api = pkgs.callPackage ./pkgs/uni-api { };
-  c7zip = pkgs.callPackage ./pkgs/c7zip { };
+  # uni-api = pkgs.callPackage ./pkgs/uni-api { };
+  # c7zip = pkgs.callPackage ./pkgs/c7zip { };
   c7zip-unfree = pkgs.callPackage ./pkgs/c7zip {
     enableUasm = true;
     uasm = pkgs.uasm;
