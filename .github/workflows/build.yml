@@ -13,6 +13,8 @@ on:
   workflow_dispatch:
 jobs:
   tests:
+    env:
+      NIXPKGS_ALLOW_UNFREE: "1"
     strategy:
       matrix:
         # Set this to notify the global nur package registry that changes are
