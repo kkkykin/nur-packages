@@ -15,12 +15,15 @@
   modules = import ./modules; # NixOS modules
   overlays = import ./overlays; # nixpkgs overlays
 
-  snow-ai = pkgs.callPackage ./pkgs/snow-ai { };
+  # snow-ai = pkgs.callPackage ./pkgs/snow-ai { };
   # uni-api = pkgs.callPackage ./pkgs/uni-api { };
   # c7zip = pkgs.callPackage ./pkgs/c7zip { };
-  c7zip-unfree = pkgs.callPackage ./pkgs/c7zip {
-    enableUasm = true;
-    uasm = pkgs.uasm;
+  # c7zip-unfree = pkgs.callPackage ./pkgs/c7zip {
+  #   enableUasm = true;
+  #   uasm = pkgs.uasm;
+  # };
+  cataclysm-dda-ncurses = pkgs.cataclysm-dda.override {
+    tiles = false;
   };
   # axonhub = pkgs.callPackage ./pkgs/axonhub { };
   # example-package = pkgs.callPackage ./pkgs/example-package { };
