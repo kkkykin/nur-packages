@@ -25,14 +25,14 @@
   cataclysm-dda-ncurses = pkgs.cataclysm-dda.override {
     tiles = false;
   };
-  dwarf-fortress-terminal =
-    (pkgs.dwarf-fortress-packages.dwarf-fortress-full.override {
-      enableTextMode = true;
-    }).overrideAttrs (_old: {
-      # ci.nix 会过滤 preferLocalBuild=true 的包（视为不可缓存），
-      # 为了进入 cacheOutputs 并推送到 Cachix，这里显式关闭它。
-      preferLocalBuild = false;
-    });
+  # dwarf-fortress-terminal =
+  #   (pkgs.dwarf-fortress-packages.dwarf-fortress-full.override {
+  #     enableTextMode = true;
+  #   }).overrideAttrs (_old: {
+  #     # ci.nix 会过滤 preferLocalBuild=true 的包（视为不可缓存），
+  #     # 为了进入 cacheOutputs 并推送到 Cachix，这里显式关闭它。
+  #     preferLocalBuild = false;
+  #   });
   # axonhub = pkgs.callPackage ./pkgs/axonhub { };
   # example-package = pkgs.callPackage ./pkgs/example-package { };
   # some-qt5-package = pkgs.libsForQt5.callPackage ./pkgs/some-qt5-package { };
