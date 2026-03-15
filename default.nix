@@ -25,6 +25,7 @@
   cataclysm-dda-ncurses = pkgs.cataclysm-dda.override {
     tiles = false;
   };
+  montecarlo-ip-searcher = pkgs.callPackage ./pkgs/montecarlo-ip-searcher {};
   # dwarf-fortress-terminal =
   #   (pkgs.dwarf-fortress-packages.dwarf-fortress-full.override {
   #     enableTextMode = true;
