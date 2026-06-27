@@ -27,6 +27,7 @@
   };
   fingerprint-chromium = pkgs.callPackage ./pkgs/fingerprint-chromium { };
   montecarlo-ip-searcher = pkgs.callPackage ./pkgs/montecarlo-ip-searcher {};
+  cli-proxy-api = pkgs.callPackage ./pkgs/cliproxyapi {};
   # dwarf-fortress-terminal =
   #   (pkgs.dwarf-fortress-packages.dwarf-fortress-full.override {
   #     enableTextMode = true;
