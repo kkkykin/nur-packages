@@ -1,5 +1,6 @@
 { lib
 , buildGoModule
+, fetchFromGitHub
 , gcc
 }:
 
@@ -9,11 +10,11 @@ in buildGoModule rec {
   pname = "cliproxyapi";
   inherit version;
 
-  # Use builtins.fetchTarball (eval-time, not a derivation) to avoid
-  # the fetchzip cross-device mv issue in this nix sandbox
-  src = builtins.fetchTarball {
-    url = "https://github.com/router-for-me/CLIProxyAPI/archive/v${version}.tar.gz";
-    sha256 = "0d0k7df77ra5q67ckwi7vsbk7g87n31v8gbj158778qai12059b5";
+  src = fetchFromGitHub {
+    owner = "router-for-me";
+    repo = "CLIProxyAPI";
+    rev = "v${version}";
+    hash = "sha256-ZaUCRIgKo3NQCXI9tMOwB70zl94n8smOwUXlc1w7EzQ=";
   };
 
   vendorHash = "sha256-vQU3hLDga5PMUwH4KSB3T5sZ1uPUgHQHeyQGJTKHIYs=";
