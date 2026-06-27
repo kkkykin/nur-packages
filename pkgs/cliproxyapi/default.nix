@@ -1,12 +1,12 @@
 { lib
-, buildGoModule
+, buildGo126Module
 , fetchFromGitHub
 , gcc
 }:
 
 let
   version = "7.2.42";
-in buildGoModule rec {
+in buildGo126Module rec {
   pname = "cliproxyapi";
   inherit version;
 
