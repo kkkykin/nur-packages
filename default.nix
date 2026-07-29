@@ -30,6 +30,7 @@
   montecarlo-ip-searcher = pkgs.callPackage ./pkgs/montecarlo-ip-searcher {};
   cli-proxy-api = pkgs.callPackage ./pkgs/cliproxyapi {};
   cpa-manager-plus = pkgs.callPackage ./pkgs/cpa-manager-plus { };
+  resin = pkgs.callPackage ./pkgs/resin { };
   # dwarf-fortress-terminal =
   #   (pkgs.dwarf-fortress-packages.dwarf-fortress-full.override {
   #     enableTextMode = true;
