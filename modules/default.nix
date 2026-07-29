@@ -4,6 +4,7 @@ let
     #
     # my-module = ./my-module;
     cpa-manager-plus = ./cpa-manager-plus;
+    proxy-checker = ./proxy-checker;
   };
 in
 modules

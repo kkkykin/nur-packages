@@ -1,0 +1,48 @@
+--- a/server.py
++++ b/server.py
+@@ -20,7 +20,8 @@
+ from proxy_check import CheckConfig, DEFAULT_TARGET_CHAT, ProxyCheckEngine, TARGET_PROFILE_OPTIONS
+ 
+ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+-CONFIG_LOCAL_PATH = os.path.join(BASE_DIR, "config.local.json")
++DATA_DIR = os.environ.get("DATA_DIR", os.getcwd())
++CONFIG_LOCAL_PATH = os.path.join(DATA_DIR, "config.local.json")
+ 
+ 
+ def load_config():
+@@ -54,19 +55,19 @@
+ # ============================================================
+ # My Repository — save/retrieve repo proxies as txt
+ # ============================================================
+-REPO_DIR = os.path.join(BASE_DIR, 'repo_data')
++REPO_DIR = os.path.join(DATA_DIR, 'repo_data')
+ os.makedirs(REPO_DIR, exist_ok=True)
+ 
+ # Checked proxies persistence — per-token checked history
+-CHECKED_DIR = os.path.join(BASE_DIR, 'checked_data')
++CHECKED_DIR = os.path.join(DATA_DIR, 'checked_data')
+ os.makedirs(CHECKED_DIR, exist_ok=True)
+ 
+ # Auto mode persistence — per-token schedule and run state
+-AUTO_DIR = os.path.join(BASE_DIR, 'auto_data')
++AUTO_DIR = os.path.join(DATA_DIR, 'auto_data')
+ os.makedirs(AUTO_DIR, exist_ok=True)
+ 
+ # Run log persistence — per-token manual and auto task summaries
+-RUN_LOG_DIR = os.path.join(BASE_DIR, 'run_logs')
++RUN_LOG_DIR = os.path.join(DATA_DIR, 'run_logs')
+ os.makedirs(RUN_LOG_DIR, exist_ok=True)
+ 
+ # === Fetch free proxies from external sources ===
+@@ -93,9 +94,9 @@
+ except Exception:
+     pass
+ 
+-LOG_FILE_PATH = str(get_config_value("log_file", "LOG_FILE", os.path.join(BASE_DIR, "server.log")))
++LOG_FILE_PATH = str(get_config_value("log_file", "LOG_FILE", os.path.join(DATA_DIR, "server.log")))
+ if not os.path.isabs(LOG_FILE_PATH):
+-    LOG_FILE_PATH = os.path.join(BASE_DIR, LOG_FILE_PATH)
++    LOG_FILE_PATH = os.path.join(DATA_DIR, LOG_FILE_PATH)
+ 
+ # --- Logging ---
+ logging.basicConfig(
