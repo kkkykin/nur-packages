@@ -88,6 +88,16 @@ in
       description = "Host port for the OneBot11 HTTP API.";
     };
 
+    publishPorts = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = ''
+        Whether to publish the WebUI and OneBot ports to the host. Disabled by
+        default: the container is usually reached over a shared network (e.g.
+        via matrix-pylon), so no host ports are bound.
+      '';
+    };
+
     extraEnvironment = lib.mkOption {
       type = lib.types.attrsOf lib.types.str;
       default = { };
@@ -182,7 +192,7 @@ in
           "${pluginsDir}:/app/napcat/plugins"
         ];
 
-        ports = [
+        ports = lib.optionals cfg.publishPorts [
           "${toString cfg.webuiPort}:6099"
           "${toString cfg.onebotWsPort}:3001"
           "${toString cfg.onebotHttpPort}:3000"

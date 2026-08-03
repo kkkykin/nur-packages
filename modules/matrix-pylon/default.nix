@@ -103,6 +103,13 @@ in
       description = "Whether the container should be started automatically.";
     };
 
+    extraOptions = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [ ];
+      example = [ "--network=host" ];
+      description = "Extra command line options passed to the container runtime.";
+    };
+
     openFirewall = lib.mkOption {
       type = lib.types.bool;
       default = false;
@@ -143,6 +150,8 @@ in
         ];
 
         ports = lib.optional cfg.publishPort "${toString cfg.listenPort}:${toString cfg.listenPort}";
+
+        extraOptions = cfg.extraOptions;
       };
     };
 
