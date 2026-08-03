@@ -4,6 +4,8 @@ let
     #
     # my-module = ./my-module;
     cpa-manager-plus = ./cpa-manager-plus;
+    matrix-pylon = ./matrix-pylon;
+    napcat = ./napcat;
     proxy-checker = ./proxy-checker;
     resin = ./resin;
   };
