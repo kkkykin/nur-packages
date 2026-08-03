@@ -103,15 +103,6 @@ in
       description = "Whether the container should be started automatically.";
     };
 
-    restartPolicy = lib.mkOption {
-      type = lib.types.nullOr lib.types.str;
-      default = "unless-stopped";
-      example = "always";
-      description = ''
-        Container restart policy.
-      '';
-    };
-
     openFirewall = lib.mkOption {
       type = lib.types.bool;
       default = false;
@@ -152,8 +143,6 @@ in
         ];
 
         ports = lib.optional cfg.publishPort "${toString cfg.listenPort}:${toString cfg.listenPort}";
-
-        extraOptions = lib.optional (cfg.restartPolicy != null) "--restart=${cfg.restartPolicy}";
       };
     };
 

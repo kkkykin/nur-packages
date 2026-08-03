@@ -122,15 +122,6 @@ in
       description = "Whether the container should be started automatically.";
     };
 
-    restartPolicy = lib.mkOption {
-      type = lib.types.nullOr lib.types.str;
-      default = "unless-stopped";
-      example = "always";
-      description = ''
-        Container restart policy.
-      '';
-    };
-
     capabilities = lib.mkOption {
       type = lib.types.attrsOf lib.types.bool;
       default = {};
@@ -202,11 +193,11 @@ in
           SYS_PTRACE = true;
         } // cfg.capabilities;
 
-        # Restart policy joins any user-supplied extra options.
+        # Restart is managed by systemd (oci-containers adds --rm), so extraOptions
+        # only carries user-supplied options plus NapCat's required seccomp opt.
         extraOptions =
           cfg.extraOptions
-          ++ [ "--security-opt=seccomp=unconfined" ]
-          ++ lib.optional (cfg.restartPolicy != null) "--restart=${cfg.restartPolicy}";
+          ++ [ "--security-opt=seccomp=unconfined" ];
       };
     };
 
