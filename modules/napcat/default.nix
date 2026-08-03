@@ -131,6 +131,19 @@ in
       '';
     };
 
+    capabilities = lib.mkOption {
+      type = lib.types.attrsOf lib.types.bool;
+      default = {};
+      description = "Linux capabilities added to the NapCat container.";
+    };
+
+    extraOptions = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [ ];
+      example = [ "--network=host" ];
+      description = "Extra command line options passed to the container runtime.";
+    };
+
     openFirewall = lib.mkOption {
       type = lib.types.bool;
       default = false;
@@ -184,7 +197,16 @@ in
           "${toString cfg.onebotHttpPort}:3000"
         ];
 
-        extraOptions = lib.optional (cfg.restartPolicy != null) "--restart=${cfg.restartPolicy}";
+        # NapCat needs SYS_PTRACE and seccomp unconfined.
+        capabilities = {
+          SYS_PTRACE = true;
+        } // cfg.capabilities;
+
+        # Restart policy joins any user-supplied extra options.
+        extraOptions =
+          cfg.extraOptions
+          ++ [ "--security-opt=seccomp=unconfined" ]
+          ++ lib.optional (cfg.restartPolicy != null) "--restart=${cfg.restartPolicy}";
       };
     };
 
