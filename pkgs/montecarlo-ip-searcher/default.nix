@@ -8,7 +8,7 @@ buildGoModule (finalAttrs: {
     owner = "Leo-Mu";
     repo = "montecarlo-ip-searcher";
     rev = "v${finalAttrs.version}";
-    hash = "sha256-F6KYnaZZF/o5udZK2A00Gs7Z4y3vzbBGi1vDVM06VrM=";
+    hash = "sha256-zGMNbfyYhdrWfUacY82fbpfp49itg5Vm+K9wuyQLrgc=";
   };
 
   vendorHash = null;
