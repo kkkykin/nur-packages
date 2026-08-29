@@ -2,6 +2,7 @@
   lib,
   fetchurl,
   stdenvNoCC,
+  nix-update-script,
 }:
 
 stdenvNoCC.mkDerivation (finalAttrs: {
@@ -27,6 +28,8 @@ stdenvNoCC.mkDerivation (finalAttrs: {
 
     runHook postInstall
   '';
+
+  passthru.updateScript = nix-update-script { };
 
   meta = with lib; {
     description = "CPA Manager Plus - Manager Server for CPA (Chrome PaLM API) management";

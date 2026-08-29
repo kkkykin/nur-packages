@@ -3,6 +3,7 @@
   buildGoModule,
   fetchFromGitHub,
   buildNpmPackage,
+  nix-update-script,
 }:
 let
   version = "1.2.0";
@@ -79,6 +80,9 @@ buildGoModule (finalAttrs: {
   ];
 
   env.CGO_ENABLED = 0;
+
+  passthru.updateScript = nix-update-script { };
+
 
   meta = with lib; {
     description = "A high-performance proxy pool gateway. Turn massive proxy subscriptions into a stable, smart, and observable network with sticky sessions.";
