@@ -22,13 +22,13 @@
   #   enableUasm = true;
   #   uasm = pkgs.uasm;
   # };
-  cataclysm-dda-ncurses = pkgs.cataclysm-dda.override {
-    tiles = false;
-  };
-  proxy-checker = pkgs.callPackage ./pkgs/proxy-checker { };
-  fingerprint-chromium = pkgs.callPackage ./pkgs/fingerprint-chromium { };
+  # cataclysm-dda-ncurses = pkgs.cataclysm-dda.override {
+  #   tiles = false;
+  # };
+  # proxy-checker = pkgs.callPackage ./pkgs/proxy-checker { };
+  # fingerprint-chromium = pkgs.callPackage ./pkgs/fingerprint-chromium { };
   montecarlo-ip-searcher = pkgs.callPackage ./pkgs/montecarlo-ip-searcher {};
-  cli-proxy-api = pkgs.callPackage ./pkgs/cliproxyapi {};
+  # cli-proxy-api = pkgs.callPackage ./pkgs/cliproxyapi {};
   cpa-manager-plus = pkgs.callPackage ./pkgs/cpa-manager-plus { };
   resin = pkgs.callPackage ./pkgs/resin { };
   # dwarf-fortress-terminal =
