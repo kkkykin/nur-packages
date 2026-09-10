@@ -7,11 +7,11 @@
 
 stdenvNoCC.mkDerivation (finalAttrs: {
   pname = "cpa-manager-plus";
-  version = "1.12.10";
+  version = "1.12.11";
 
   src = fetchurl {
     url = "https://github.com/seakee/CPA-Manager-Plus/releases/download/v${finalAttrs.version}/cpa-manager-plus_v${finalAttrs.version}_linux_amd64.tar.gz";
-    hash = "sha256-l+gVSMcd7yAGXF7qPiOWtMcgqAlGbX/Clzcvjgg7dnA=";
+    hash = "sha256-CdZbekiubyS/WFIdRxCatubhV/z0EwsqRe6YmMJwMrs=";
   };
 
   dontBuild = true;
