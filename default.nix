@@ -28,6 +28,7 @@
   # proxy-checker = pkgs.callPackage ./pkgs/proxy-checker { };
   # fingerprint-chromium = pkgs.callPackage ./pkgs/fingerprint-chromium { };
   montecarlo-ip-searcher = pkgs.callPackage ./pkgs/montecarlo-ip-searcher {};
+  gori = pkgs.callPackage ./pkgs/gori { };
   # cli-proxy-api = pkgs.callPackage ./pkgs/cliproxyapi {};
   cpa-manager-plus = pkgs.callPackage ./pkgs/cpa-manager-plus { };
   resin = pkgs.callPackage ./pkgs/resin { };
