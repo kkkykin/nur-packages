@@ -1,19 +1,32 @@
-{ lib, stdenv }:
+{
+  lib,
+  fetchurl,
+  stdenvNoCC,
+  nix-update-script,
+}:
 
-stdenv.mkDerivation rec {
+stdenvNoCC.mkDerivation (finalAttrs: {
   pname = "caddy-custom";
   version = "2.11.4-2026-09-09-071152";
 
-  src = fetchTarball {
-    url = "https://github.com/kkkykin/custom-caddy/releases/download/v${version}/caddy-linux-amd64.tar.gz";
-    sha256 = "sha256:1kp0hbviv7jl6rvh8915bdwdj1gfvjhdwkm4drffq79n3qa5fw36";
+  src = fetchurl {
+    url = "https://github.com/kkkykin/custom-caddy/releases/download/v${finalAttrs.version}/caddy-linux-amd64.tar.gz";
+    hash = "sha256-7K7+qufqfaUfDHexAiUIe2E56WCocODKP4+kOdg9X3A=";
   };
 
+  dontBuild = true;
+  dontUnpack = false;
+  sourceRoot = ".";
+
   installPhase = ''
-    mkdir -p $out/bin
-    cp caddy $out/bin
-    chmod +x $out/bin/caddy
+    runHook preInstall
+
+    install -Dm755 caddy $out/bin/caddy
+
+    runHook postInstall
   '';
+
+  passthru.updateScript = nix-update-script { };
 
   meta = with lib; {
     description = "Prebuilt custom Caddy binary";
@@ -22,4 +35,4 @@ stdenv.mkDerivation rec {
     platforms = [ "x86_64-linux" ];
     mainProgram = "caddy";
   };
-}
+})
