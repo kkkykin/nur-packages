@@ -7,11 +7,11 @@
 
 stdenvNoCC.mkDerivation (finalAttrs: {
   pname = "hubproxy";
-  version = "1.2.4";
+  version = "1.2.5";
 
   src = fetchurl {
     url = "https://github.com/sky22333/hubproxy/releases/download/v${finalAttrs.version}/hubproxy-linux-amd64.tar.gz";
-    hash = "sha256-gyaIb/Qm9RS4cpiowrLQMAkh/jCS3jgY/epDo9pTSCE=";
+    hash = "sha256-KQmna5zT9caYv1Q7rimJozidWc9hLYBlYR8G2TfsO20=";
   };
 
   dontBuild = true;

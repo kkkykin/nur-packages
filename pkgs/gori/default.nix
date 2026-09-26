@@ -2,7 +2,7 @@
 
 stdenvNoCC.mkDerivation (finalAttrs: {
   pname = "gori";
-  version = "0.5.0";
+  version = "0.7.1";
 
   # Linux release assets are raw binaries (no tarball, no enclosing dir).
   src =
@@ -14,7 +14,7 @@ stdenvNoCC.mkDerivation (finalAttrs: {
     else
       fetchurl {
         url = "https://github.com/hahwul/gori/releases/download/v${finalAttrs.version}/gori-v${finalAttrs.version}-linux-x86_64";
-        hash = "sha256-7nC6RVCxClxPX19rBDg4jXnBeEDGzD9uLBLzBFyuRIk=";
+        hash = "sha256-Xd7/4cPl/fym9XtMiR5PXcy+Qsbg+GqInEiUZvExTG8=";
       };
 
   # Raw ELF binary — nothing to unpack.
