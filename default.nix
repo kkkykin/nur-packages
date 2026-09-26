@@ -32,6 +32,8 @@
   # cli-proxy-api = pkgs.callPackage ./pkgs/cliproxyapi {};
   cpa-manager-plus = pkgs.callPackage ./pkgs/cpa-manager-plus { };
   resin = pkgs.callPackage ./pkgs/resin { };
+  caddy-custom = pkgs.callPackage ./pkgs/caddy-custom { };
+  hubproxy = pkgs.callPackage ./pkgs/hubproxy { };
   # dwarf-fortress-terminal =
   #   (pkgs.dwarf-fortress-packages.dwarf-fortress-full.override {
   #     enableTextMode = true;
