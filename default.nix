@@ -34,6 +34,7 @@
   resin = pkgs.callPackage ./pkgs/resin { };
   caddy-custom = pkgs.callPackage ./pkgs/caddy-custom { };
   hubproxy = pkgs.callPackage ./pkgs/hubproxy { };
+  matterbridge = pkgs.callPackage ./pkgs/matterbridge { };
   # dwarf-fortress-terminal =
   #   (pkgs.dwarf-fortress-packages.dwarf-fortress-full.override {
   #     enableTextMode = true;
