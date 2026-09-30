@@ -7,7 +7,7 @@
 
 buildGoModule (finalAttrs: {
   pname = "matterbridge";
-  version = "1.26.0-unstable-2026-09-30";
+  version = "0-unstable-2026-09-30";
 
   src = fetchFromGitHub {
     owner = "kkkykin";
