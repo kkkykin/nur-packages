@@ -9,10 +9,10 @@ buildGoModule (finalAttrs: {
   version = "1.26.0-unstable-2026-09-09";
 
   src = fetchFromGitHub {
-    owner = "matterbridge-org";
+    owner = "kkkykin";
     repo = "matterbridge";
-    rev = "0f595bc86e2b4469240212ec7ffd920c0b3db23b";
-    hash = "sha256-KzoAUnTaoGFww1QiDLMyDGGUrc9YF4Bia4MpLIZkNUs=";
+    rev = "feature/onebot-protocol";
+    hash = "sha256-EQ+e2XeiGKAk9Q0ZPAhZfn2gv6utfkLVvpdvtumXi50=";
   };
 
   vendorHash = "sha256-1hrGSYJFZH/v3EShMINkmCRE6UuY+osNg8aoj1nzeQE=";
