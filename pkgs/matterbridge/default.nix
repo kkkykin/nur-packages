@@ -2,6 +2,7 @@
   lib,
   buildGoModule,
   fetchFromGitHub,
+  nix-update-script,
 }:
 
 buildGoModule (finalAttrs: {
@@ -11,8 +12,8 @@ buildGoModule (finalAttrs: {
   src = fetchFromGitHub {
     owner = "kkkykin";
     repo = "matterbridge";
-    rev = "feature/onebot-protocol";
-    hash = "sha256-RHrubAw58fZz5PNqVxPR3rVvSTVrRZFKjJ9DGWVtOdM=";
+    rev = "ef194d2adcb912e297d1b0b868dfecdeb6685a0f";
+    hash = "sha256-RXfKFuAWy0BP3+5ssmP01LyRZBN3UENPQRhx1wDuYmc=";
   };
 
   vendorHash = "sha256-1hrGSYJFZH/v3EShMINkmCRE6UuY+osNg8aoj1nzeQE=";
@@ -28,6 +29,12 @@ buildGoModule (finalAttrs: {
   ];
 
   env.CGO_ENABLED = 0;
+
+  passthru.updateScript = nix-update-script {
+    extraArgs = [
+      "--version=branch=feature/onebot-protocol"
+    ];
+  };
 
   meta = with lib; {
     description = "Bridge between mattermost, IRC, XMPP, Gitter, Slack, Discord, Telegram, Rocket.Chat, Zulip, Matrix, Steam, Twitch and more";
