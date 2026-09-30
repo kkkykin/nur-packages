@@ -6,13 +6,13 @@
 
 buildGoModule (finalAttrs: {
   pname = "matterbridge";
-  version = "1.26.0-unstable-2026-09-09";
+  version = "1.26.0-unstable-2026-09-30";
 
   src = fetchFromGitHub {
     owner = "kkkykin";
     repo = "matterbridge";
     rev = "feature/onebot-protocol";
-    hash = "sha256-EQ+e2XeiGKAk9Q0ZPAhZfn2gv6utfkLVvpdvtumXi50=";
+    hash = "sha256-RHrubAw58fZz5PNqVxPR3rVvSTVrRZFKjJ9DGWVtOdM=";
   };
 
   vendorHash = "sha256-1hrGSYJFZH/v3EShMINkmCRE6UuY+osNg8aoj1nzeQE=";
