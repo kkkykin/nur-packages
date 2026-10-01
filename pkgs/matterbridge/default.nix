@@ -12,8 +12,8 @@ buildGoModule (finalAttrs: {
   src = fetchFromGitHub {
     owner = "kkkykin";
     repo = "matterbridge";
-    rev = "c10dab1a3db08834d6919ee76d2ac2f7fb2d41ba";
-    hash = "sha256-bgVdURGOPNF95nfV26H360KGJF13PX+BspGC2Mpkgiw=";
+    rev = "bcda3f29ab6ea584995675672327791d221fdd6a";
+    hash = "sha256-CyjPwlEE9Swk5MddQT8/D6rENe0hl0D3FM3pA+wAn2I=";
   };
 
   vendorHash = "sha256-1hrGSYJFZH/v3EShMINkmCRE6UuY+osNg8aoj1nzeQE=";
