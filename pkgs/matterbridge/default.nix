@@ -7,13 +7,13 @@
 
 buildGoModule (finalAttrs: {
   pname = "matterbridge";
-  version = "0-unstable-2026-10-02";
+  version = "0-unstable-2026-10-04";
 
   src = fetchFromGitHub {
     owner = "kkkykin";
     repo = "matterbridge";
-    rev = "251492047760c3899ee45294a8f77da1655464c6";
-    hash = "sha256-17uxHZ5lwIxrLzShx1X//ecju4R6imBQVcCGCEqQqEM=";
+    rev = "417690e25ee6e91e0f79f0b77173d60b1ed11315";
+    hash = "sha256-0RZMnO/4yshb6SxNex/dCVENk97yFB6zqGp+pG54qqs=";
   };
 
   vendorHash = "sha256-1hrGSYJFZH/v3EShMINkmCRE6UuY+osNg8aoj1nzeQE=";
