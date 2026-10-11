@@ -11,7 +11,6 @@ let
     openlist = ./openlist;
     proxy-checker = ./proxy-checker;
     resin = ./resin;
-    romm = ./romm;
     srs-decompile = ./srs-decompile;
   };
 in
