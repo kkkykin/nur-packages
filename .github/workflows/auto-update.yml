@@ -24,10 +24,16 @@ jobs:
       - name: Update packages
         run: nix run .#update
 
-      - name: Commit back to repository
+      - name: Check flake evaluation
+        id: check_flake
         if: always()
+        run: nix flake check --no-build
+
+      - name: Commit back to repository
+        if: always() && steps.check_flake.conclusion == 'success'
         uses: stefanzweifel/git-auto-commit-action@v7
         with:
           commit_message: 'auto: update packages'
           commit_user_name: 'github-actions[bot]'
           commit_user_email: 'github-actions[bot]@users.noreply.github.com'
+

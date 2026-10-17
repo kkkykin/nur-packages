@@ -125,6 +125,7 @@ let
         inherit (p) pname;
         name = p.pkgName;
         updateScript = p.script;
+        inherit (p) position;
       }) selected
     )
   );
@@ -165,13 +166,18 @@ pkgs.stdenvNoCC.mkDerivation {
     cd "${toString ./.}/.."
 
     MAX_JOBS="''${UPDATE_PACKAGE_JOBS:-$(nproc)}"
-    declare -A JOB_ATTR=() JOB_LOG=()
+    declare -A JOB_ATTR=() JOB_LOG=() JOB_FILE=()
     RUNNING=0
 
     launch() {
-      local PKG="$1" ATTR_PATH OLD_VERSION LOG
+      local PKG="$1" ATTR_PATH OLD_VERSION LOG POS FILE
       ATTR_PATH=$(jq -r .attrPath <<<"$PKG")
       OLD_VERSION=$(jq -r .oldVersion <<<"$PKG")
+      POS=$(jq -r .position <<<"$PKG")
+      FILE=""
+      if [ "$POS" != "null" ] && [ -n "$POS" ]; then
+        FILE="$(echo "$POS" | cut -d: -f1)"
+      fi
       LOG=$(mktemp "$LOGDIR/log.XXXXXX")
       echo ">>> $ATTR_PATH: updating ($OLD_VERSION)"
       (
@@ -190,23 +196,32 @@ pkgs.stdenvNoCC.mkDerivation {
       ) >"$LOG" 2>&1 &
       JOB_ATTR[$!]="$ATTR_PATH"
       JOB_LOG[$!]="$LOG"
+      JOB_FILE[$!]="$FILE"
       RUNNING=$((RUNNING + 1))
     }
 
     reap_one() {
-      local PID STATUS ATTR_PATH LOG
+      local PID STATUS ATTR_PATH LOG FILE
       PID=""
       STATUS=0
       wait -n -p PID || STATUS=$?
       ATTR_PATH="''${JOB_ATTR[$PID]}"
       LOG="''${JOB_LOG[$PID]}"
+      FILE="''${JOB_FILE[$PID]}"
       echo ""
       cat "$LOG"
       rm -f "$LOG"
       if [ "$STATUS" -ne 0 ]; then
         FAILED="$FAILED $ATTR_PATH"
+        if [ -n "$FILE" ] && [ -e "$FILE" ]; then
+          local DIR
+          DIR="$(dirname "$FILE")"
+          echo ">>> $ATTR_PATH: rolling back dirty files in $DIR"
+          git checkout -- "$DIR" 2>/dev/null || true
+          git clean -fd "$DIR" 2>/dev/null || true
+        fi
       fi
-      unset "JOB_ATTR[$PID]" "JOB_LOG[$PID]"
+      unset "JOB_ATTR[$PID]" "JOB_LOG[$PID]" "JOB_FILE[$PID]"
       RUNNING=$((RUNNING - 1))
     }
 
