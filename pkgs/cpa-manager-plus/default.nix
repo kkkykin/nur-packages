@@ -7,11 +7,11 @@
 
 stdenvNoCC.mkDerivation (finalAttrs: {
   pname = "cpa-manager-plus";
-  version = "qualification-ret07-3b3985dc7c26-20261015";
+  version = "1.14.7";
 
   src = fetchurl {
     url = "https://github.com/seakee/CPA-Manager-Plus/releases/download/v${finalAttrs.version}/cpa-manager-plus_v${finalAttrs.version}_linux_amd64.tar.gz";
-    hash = "sha256-BJD+AuP9shnx6IkAPUIW7Qd8NvhZ+GPcnLkGd2nD5TI=";
+    hash = "sha256-N+NXQEWX7U5OyoasrZLmHe31w1Dq4p0UyISCwlW4hWM=";
   };
 
   dontBuild = true;
@@ -29,7 +29,12 @@ stdenvNoCC.mkDerivation (finalAttrs: {
     runHook postInstall
   '';
 
-  passthru.updateScript = nix-update-script { };
+  passthru.updateScript = nix-update-script {
+    extraArgs = [
+      "--version-regex"
+      "v([0-9.]+)"
+    ];
+  };
 
   meta = with lib; {
     description = "CPA Manager Plus - Manager Server for CPA (Chrome PaLM API) management";
