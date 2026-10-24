@@ -7,11 +7,11 @@
 
 stdenvNoCC.mkDerivation (finalAttrs: {
   pname = "caddy-custom";
-  version = "2.11.4-2026-09-27-040029";
+  version = "2.11.7-2026-10-24-022906";
 
   src = fetchurl {
     url = "https://github.com/kkkykin/custom-caddy/releases/download/v${finalAttrs.version}/caddy-linux-amd64.tar.gz";
-    hash = "sha256-dI6WxN+H9C3cQb1NxR4gjrJv89RUu8bsSfEIaYFZ/uc=";
+    hash = "sha256-PAyc1VhrwurNPd/uR7WPrKtGqnG0kw6mDSchgRCOl8E=";
   };
 
   dontBuild = true;
