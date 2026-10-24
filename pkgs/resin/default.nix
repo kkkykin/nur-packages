@@ -6,13 +6,13 @@
   nix-update-script,
 }:
 let
-  version = "1.2.0";
+  version = "1.3.0";
 
   src = fetchFromGitHub {
     owner = "Resinat";
     repo = "Resin";
     tag = "v${version}";
-    hash = "sha256-tqSuYZce0uq9gVSstNLPlSyJPGWwYrfvCEgAyXiek4c=";
+    hash = "sha256-6YBI15NLupgEKwSwGy9x7JToYP7G5/7IyF+Ty5pKpQ8=";
   };
 
   # Built separately with the Nix-managed npm toolchain, then dropped into
@@ -56,7 +56,7 @@ buildGo127Module (finalAttrs: {
 
   subPackages = [ "cmd/resin" ];
 
-  vendorHash = "sha256-7Nys4ybPKtdS8fU0yUuYk5BEergdLkmNabFnsiap+L0=";
+  vendorHash = "sha256-t9mh/ILcFrrbEQTYAQOqI5F6F2L57ZmjBNTih+SlEk4=";
 
   # The -tags match the upstream release workflow (.github/workflows/release.yml),
   # with `with_gvisor` added on top to enable the gVisor netstack/TUN transport
