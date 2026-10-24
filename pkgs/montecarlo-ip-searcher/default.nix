@@ -1,6 +1,6 @@
-{ lib, buildGoModule, fetchFromGitHub, nix-update-script }:
+{ lib, buildGo127Module, fetchFromGitHub, nix-update-script }:
 
-buildGoModule (finalAttrs: {
+buildGo127Module (finalAttrs: {
   pname = "mcis";
   version = "0.2.4";
 

@@ -1,6 +1,6 @@
 {
   lib,
-  buildGoModule,
+  buildGo127Module,
   fetchFromGitHub,
   buildNpmPackage,
   nix-update-script,
@@ -41,7 +41,7 @@ let
     '';
   };
 in
-buildGoModule (finalAttrs: {
+buildGo127Module (finalAttrs: {
   pname = "resin";
   inherit version src;
 

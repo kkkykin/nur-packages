@@ -29,7 +29,6 @@
   # fingerprint-chromium = pkgs.callPackage ./pkgs/fingerprint-chromium { };
   montecarlo-ip-searcher = pkgs.callPackage ./pkgs/montecarlo-ip-searcher {};
   gori = pkgs.callPackage ./pkgs/gori { };
-  # cli-proxy-api = pkgs.callPackage ./pkgs/cliproxyapi {};
   cpa-manager-plus = pkgs.callPackage ./pkgs/cpa-manager-plus { };
   resin = pkgs.callPackage ./pkgs/resin { };
   caddy-custom = pkgs.callPackage ./pkgs/caddy-custom { };
@@ -43,7 +42,6 @@
   #     # 为了进入 cacheOutputs 并推送到 Cachix，这里显式关闭它。
   #     preferLocalBuild = false;
   #   });
-  # axonhub = pkgs.callPackage ./pkgs/axonhub { };
   # example-package = pkgs.callPackage ./pkgs/example-package { };
   # some-qt5-package = pkgs.libsForQt5.callPackage ./pkgs/some-qt5-package { };
   # ...
