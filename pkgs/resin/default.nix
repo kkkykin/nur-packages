@@ -58,7 +58,7 @@ buildGo127Module (finalAttrs: {
 
   vendorHash = "sha256-7Nys4ybPKtdS8fU0yUuYk5BEergdLkmNabFnsiap+L0=";
 
-  # The -tags match the upstream release workflow (.github/workflows/release.yml),
+  # The with_* tags match the upstream release workflow (.github/workflows/release.yml),
   # with `with_gvisor` added on top to enable the gVisor netstack/TUN transport
   # paths. GitCommit uses the short rev from the pinned tag; BuildTime is omitted
   # for reproducibility (CI injects a wall-clock time).
@@ -70,6 +70,8 @@ buildGo127Module (finalAttrs: {
     "with_embedded_tor"
     "with_naive_outbound"
     "with_gvisor"
+    # Keep the HTTP/2 connPool method used by sing-box's go:linkname on Go 1.27.
+    "http2legacy"
   ];
 
   ldflags = [
