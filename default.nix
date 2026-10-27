@@ -34,6 +34,8 @@
   caddy-custom = pkgs.callPackage ./pkgs/caddy-custom { };
   hubproxy = pkgs.callPackage ./pkgs/hubproxy { };
   matterbridge = pkgs.callPackage ./pkgs/matterbridge { };
+  dico-stardict = pkgs.callPackage ./pkgs/dico-stardict { };
+  dico = pkgs.callPackage ./pkgs/dico { };
   # dwarf-fortress-terminal =
   #   (pkgs.dwarf-fortress-packages.dwarf-fortress-full.override {
   #     enableTextMode = true;

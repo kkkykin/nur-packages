@@ -5,6 +5,7 @@ let
     # my-module = ./my-module;
     cli-proxy-api = ./cli-proxy-api;
     cpa-manager-plus = ./cpa-manager-plus;
+    dico = ./dico;
     hubproxy = ./hubproxy;
     matrix-pylon = ./matrix-pylon;
     napcat = ./napcat;
