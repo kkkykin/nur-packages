@@ -60,12 +60,7 @@
     ''}
     ${lib.optionalString (lib.any (db: format db == "stardict") cfg.DBs) ''
       load-module stardict {
-        command ${command [
-        "python"
-        "load-path=${cfg.stardictModule}/share/dico/python"
-        "init-script=stardict"
-        "root-class=DicoModule"
-      ]};
+        command ${command ["${cfg.stardictModule}/lib/dico/stardict"]};
       }
     ''}
     ${lib.concatMapStringsSep "\n" databaseConfig cfg.DBs}
@@ -77,16 +72,16 @@ in {
 
     package = lib.mkOption {
       type = lib.types.package;
-      default = pkgs.callPackage ../../pkgs/dico {};
-      defaultText = lib.literalExpression "pkgs.kkkykin.dico";
-      description = "GNU Dico built with its Python database module enabled.";
+      default = pkgs.dico;
+      defaultText = lib.literalExpression "pkgs.dico";
+      description = "GNU Dico dictionary server package.";
     };
 
     stardictModule = lib.mkOption {
       type = lib.types.package;
-      default = pkgs.callPackage ../../pkgs/dico-stardict {};
-      defaultText = lib.literalExpression "pkgs.kkkykin.dico-stardict";
-      description = "Package providing share/dico/python/stardict.py.";
+      default = pkgs.callPackage ../../pkgs/dico-stardict-native { dico = cfg.package; };
+      defaultText = lib.literalExpression "pkgs.callPackage ./pkgs/dico-stardict-native { dico = config.services.dico.package; }";
+      description = "Package providing lib/dico/stardict.so, built against services.dico.package.";
     };
 
     DBs = lib.mkOption {

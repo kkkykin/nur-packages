@@ -28,8 +28,10 @@ in {
 The service listens on `127.0.0.1:2628` by default. `listenAddress`, `port`,
 `openFirewall`, `package`, `stardictModule`, and `extraConfig` can be overridden.
 Existing `pkgs.dictdDBs` packages can be served alongside StarDict dictionaries.
-The service uses this repository's `dico` package, which explicitly enables the
-Python module that nixpkgs' build otherwise skips under `strictDeps`.
+The service uses nixpkgs' unmodified `pkgs.dico` and the independently compiled
+`dico-stardict-native` C module. The module links against Dico, libunistring and
+zlib. Python generates its HTML entity table and runs tests during the build;
+serving dictionaries does not use Dico's Python bridge.
 
 The backend supports StarDict 2.4.2 and 3.0.0, 32/64-bit index offsets, gzip
 indexes, dictzip definitions, synonyms, multiple definitions, and typed article
@@ -48,11 +50,11 @@ python3 pkgs/dico-stardict/stardict.py /path/to/dictionary.ifo --check
 # The dico-stardict package installs the same CLI as stardict-query.
 ```
 
-To load the script in a manual `dicod.conf`:
+To load the native module in a manual `dicod.conf`:
 
 ```text
 load-module stardict {
-  command "python load-path=/path/to/script init-script=stardict root-class=DicoModule";
+  command "/path/to/dico-stardict-native/lib/dico/stardict";
 }
 database {
   name "langdao";
@@ -60,8 +62,21 @@ database {
 }
 ```
 
-Run the format and callback tests with:
+The Python CLI remains available for independent queries and build-time
+dictionary validation. Run its format and callback tests with:
 
 ```sh
 PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s pkgs/dico-stardict -v
 ```
+
+The native package runs integration tests through `dicod` during its check phase.
+To run them against an already compiled module:
+
+```sh
+DICOD=/path/to/dicod STARDICT_MODULE=/path/to/stardict.so \
+  python3 -m unittest discover -s pkgs/dico-stardict-native -v
+```
+
+MATCH results escape quotes and backslashes in headwords. GNU Dico 2.12 itself
+does not escape the query word in the `151` DEFINE response header; this upstream
+limitation also applies when using the native module.
