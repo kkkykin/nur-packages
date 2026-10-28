@@ -106,6 +106,26 @@ For example, a local XiaoXueTang Japanese–Chinese conversion grew from about
 Full dictionaries can still exceed a small VPS's available memory; conversion
 and dictzip do not remove the backend's own index allocations.
 
+## Cross-references
+
+HTML dictionary links and XDXF `<kref>` references become DICT `{target}`
+markers. When the label differs from the target, both are kept:
+
+| Input | DICT text |
+| --- | --- |
+| `<a href="bword://apple">apple</a>` | `{apple}` |
+| `<a href="bword://apple">apples</a>` | `apples ({apple})` |
+| `<a href="bword://%E9%A3%9F%E3%81%B9%E3%82%8B">食事</a>` | `食事 ({食べる})` |
+| `<kref k="apple">apples</kref>` | `apples ({apple})` |
+
+The converter recognizes `bword:`, `entry:`, `d:`, `x:` and bare dictionary
+targets, decodes URL escapes, and preserves inline text and paragraph breaks.
+External URLs and invalid targets retain their labels as plain text. Existing
+literal braces are preserved. DICT clients decide how to display `{target}`;
+the server transmits the markers as part of the definition.
+
+This handling lives in `dict-convert` and uses the stock PyGlossary package.
+
 ## Output and validation
 
 Definitions contain the original headword and plain UTF-8 text. HTML/XDXF tags
@@ -125,4 +145,5 @@ identical source data produces identical outputs.
 The converter's Nix check phase runs protocol tests against **unmodified Dico
 and dictd**. Tests cover compressed StarDict with 64-bit offsets, tab-separated
 input, synonyms, duplicate definitions, English/Japanese inflections, Unicode
-and punctuation lookup, compression errors, and reproducible compressed output.
+and punctuation lookup, HTML/XDXF cross-references, DICT round trips, invalid
+link targets, compression errors, and reproducible compressed output.

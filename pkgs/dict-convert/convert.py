@@ -8,9 +8,11 @@ from html.parser import HTMLParser
 import json
 import logging
 from pathlib import Path
+import re
 import sqlite3
 import subprocess
 import tempfile
+from urllib.parse import unquote
 
 from pyglossary import plugin_handler
 from pyglossary.glossary_v2 import Glossary as BaseGlossary
@@ -43,16 +45,49 @@ class Glossary(BaseGlossary):
         self._cleanupPathList.add(self._tmpDataDir)
 
 
+def reference_target(href):
+    """Recognize dictionary links without turning other URL schemes into lookups."""
+    if not href:
+        return None
+    target = href.strip()
+    for prefix in ("bword:", "entry:", "d:", "x:"):
+        if target.lower().startswith(prefix):
+            target = target[len(prefix):].removeprefix("//")
+            break
+    else:
+        if target.startswith(("#", "//")) or re.match(r"[A-Za-z][A-Za-z0-9+.-]*:", target):
+            return None
+    try:
+        target = unquote(target, errors="strict").strip()
+        validate_word(target)
+    except (ValueError, UnicodeError):
+        return None
+    # Braces would split one target into multiple DICT cross-references.
+    return None if "{" in target or "}" in target else target
+
+
 class PlainText(HTMLParser):
     def __init__(self):
         super().__init__(convert_charrefs=True)
         self.parts = []
+        self.links = []
 
     def handle_starttag(self, tag, attrs):
+        if tag in {"a", "kref"}:
+            href = dict(attrs).get("href" if tag == "a" else "k")
+            self.links.append((tag, href, len(self.parts)))
         if tag in {"br", "p", "div", "li", "tr"}:
             self.parts.append("\n")
 
     def handle_endtag(self, tag):
+        if self.links and tag == self.links[-1][0]:
+            _, href, start = self.links.pop()
+            label = "".join(self.parts[start:])
+            text = label.strip()
+            target = reference_target(text if tag == "kref" and href is None else href)
+            if target:
+                link = f"{text} ({{{target}}})" if text and text != target else f"{{{target}}}"
+                self.parts[start:] = [label.replace(text, link, 1) if text else link]
         if tag in {"p", "div", "li", "tr"}:
             self.parts.append("\n")
 
@@ -61,7 +96,8 @@ class PlainText(HTMLParser):
 
 
 def plain_text(entry):
-    if entry.defiFormat in {"h", "x"}:
+    # Some readers, including DictOrg, emit HTML with the default text format.
+    if entry.detectDefiFormat() in {"h", "x"}:
         parser = PlainText()
         parser.feed(entry.defi)
         parser.close()

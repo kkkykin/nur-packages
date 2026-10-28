@@ -1,5 +1,6 @@
 """Real PyGlossary conversion and DICT queries against both stock servers."""
 import gzip
+from html import escape
 import json
 import os
 from pathlib import Path
@@ -20,7 +21,7 @@ class ConversionTests(unittest.TestCase):
         self.addCleanup(self.directory.cleanup)
         self.root = Path(self.directory.name)
 
-    def stardict(self, records, *, synonyms=(), bits=32, compressed=False):
+    def stardict(self, records, *, synonyms=(), bits=32, compressed=False, defi_format="h"):
         base = self.root / "source"
         data, index = bytearray(), bytearray()
         for word, definition in records:
@@ -31,7 +32,7 @@ class ConversionTests(unittest.TestCase):
         base.with_suffix(".ifo").write_text(
             "StarDict's dict ifo file\n" + ("version=3.0.0\n" if bits == 64 else "version=2.4.2\n")
             + f"bookname=测试辞書\nwordcount={len(records)}\nidxfilesize={len(index)}\n"
-            + f"idxoffsetbits={bits}\nsynwordcount={len(synonyms)}\nsametypesequence=h\n",
+            + f"idxoffsetbits={bits}\nsynwordcount={len(synonyms)}\nsametypesequence={defi_format}\n",
             encoding="utf-8")
         if compressed:
             base.with_suffix(".idx.gz").write_bytes(gzip.compress(index))
@@ -137,6 +138,65 @@ class ConversionTests(unittest.TestCase):
         self.assertFalse(one.with_suffix(".dict").exists())
         self.assertEqual(sorted(p.name for p in self.root.iterdir()),
                          ["one.dict.dz", "one.index", "one.json", "source.tsv", "two.dict.dz", "two.index", "two.json"])
+
+    def test_html_cross_references_in_both_servers(self):
+        source = self.stardict([("reference",
+            '<p>See <a href="bword://apple"><b>apple</b></a> and '
+            "<A HREF='ENTRY://apple'>apples</A>.</p>"
+            '<p><a href="bword://%E9%A3%9F%E3%81%B9%E3%82%8B">食事</a>; '
+            '<a href="d:ice%20cream">ice cream</a>; '
+            '<a href="x://A&amp;B">A&amp;B</a>; '
+            '<a href="apple"> apple </a>; <a href="bword://apple"></a>.</p>'
+            '<p><a href="https://example.com">website</a> and {literal}.</p>')], compressed=True)
+        base = self.root / "converted"
+        convert(source, base)
+        expected = ("See {apple} and apples ({apple}).\n\n"
+                    "食事 ({食べる}); {ice cream}; {A&B};  {apple} ; {apple}.\n\n"
+                    "website and {literal}.")
+        for server in ("dico", "dictd"):
+            with self.subTest(server=server):
+                output = self.query(server, base, ["DEFINE fixture reference"])
+                self.assertIn(expected, output)
+                self.assertNotIn("<a ", output)
+                self.assertNotIn("{https", output)
+
+    def test_xdxf_cross_references_in_both_servers(self):
+        source = self.stardict([("reference",
+            'See <kref k="apple">apples</kref> and <kref>食べる</kref>.')], defi_format="x")
+        for to_html in (False, True):
+            base = self.root / f"converted-{to_html}"
+            convert(source, base, read_options={"xdxf_to_html": to_html})
+            for server in ("dico", "dictd"):
+                with self.subTest(to_html=to_html, server=server):
+                    output = self.query(server, base, ["DEFINE fixture reference"])
+                    self.assertIn("See apples ({apple}) and {食べる}.", output)
+
+    def test_unsafe_and_external_link_targets_preserve_labels(self):
+        targets = ["https://example.com", "mailto:test@example.com", "file:///tmp/file",
+                   "ftp://example.com", "javascript:alert(1)", "data:text/plain,test",
+                   "#section", "//example.com", "bword://", "bword://bad%00word",
+                   "bword://bad%0Aword", "bword://bad%7Bword%7D", "bword://%ff",
+                   "bword://" + "x" * 4097]
+        source = self.stardict([("reference", "<br>".join(
+            f'<a href="{escape(target, quote=True)}">label-{i}</a>' for i, target in enumerate(targets))
+            + '<br><a href="bword://apple">unfinished')])
+        base = self.root / "converted"
+        convert(source, base)
+        for server in ("dico", "dictd"):
+            with self.subTest(server=server):
+                output = self.query(server, base, ["DEFINE fixture reference"])
+                self.assertIn("\n".join(f"label-{i}" for i in range(len(targets))) + "\nunfinished", output)
+                self.assertNotIn("{", output)
+
+    def test_dictorg_cross_references_survive_round_trip(self):
+        source = self.tabfile([("reference", "See {apple} and {食べる}."), ("apple", "fruit")])
+        original, base = self.root / "original", self.root / "converted"
+        convert(source, original)
+        convert(original.with_suffix(".index"), base, input_format="DictOrg")
+        for server in ("dico", "dictd"):
+            with self.subTest(server=server):
+                output = self.query(server, base, ["DEFINE fixture reference"])
+                self.assertIn("See {apple} and {食べる}.", output)
 
     def test_disable_inflections_and_preserve_ambiguous_aliases(self):
         source = self.tabfile([("go", "verb"), ("went", "existing definition"), ("child", "noun")])
