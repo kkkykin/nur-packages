@@ -1,5 +1,10 @@
 # StarDict for GNU Dico
 
+For a standard dictzip-compressed database usable by both dictd and Dico,
+including English/Japanese inflection lookup, use
+[`lib.makeDictdDB`](../dict-convert/README.md). It accepts other PyGlossary
+input formats as well and needs no StarDict module at runtime.
+
 `lib.makeStardictDB` uses the same positional arguments as nixpkgs'
 `makeDictdDB`: source archive, database name, archive subdirectory, and locale.
 The subdirectory must contain exactly one dictionary. Its `.ifo`, `.idx` (or
