@@ -125,6 +125,8 @@ literal braces are preserved. DICT clients decide how to display `{target}`;
 the server transmits the markers as part of the definition.
 
 This handling lives in `dict-convert` and uses the stock PyGlossary package.
+StarDict XDXF is read directly by default (`xdxf_to_html = false`) to preserve
+inline spaces across PyGlossary versions. `readOptions` can override this.
 
 ## Output and validation
 

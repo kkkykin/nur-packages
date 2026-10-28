@@ -197,7 +197,13 @@ def convert(input_file, output_base, *, input_format="", languages=(), read_opti
             glos = Glossary(Path(directory) / "resources")
             glos.progressbar = False
             glos.config = {"skip_resources": True}
-            glos.directRead(str(input_file), formatName=input_format, **(read_options or {}))
+            input_format = Glossary.detectInputFormat(str(input_file), formatName=input_format).formatName
+            reader_options = dict(read_options or {})
+            if input_format == "Stardict":
+                # PyGlossary 5.3's XDXF-to-HTML transform strips inline spaces.
+                # Our text renderer handles native XDXF, preserving the source.
+                reader_options = {"xdxf_to_html": False, **reader_options}
+            glos.directRead(str(input_file), formatName=input_format, **reader_options)
             writer = Writer(glos)
             # These are the DictOrg plugin's own write options (the same
             # attributes PyGlossary's convert API sets from writeOptions).

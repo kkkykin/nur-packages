@@ -163,13 +163,20 @@ class ConversionTests(unittest.TestCase):
     def test_xdxf_cross_references_in_both_servers(self):
         source = self.stardict([("reference",
             'See <kref k="apple">apples</kref> and <kref>食べる</kref>.')], defi_format="x")
-        for to_html in (False, True):
+        for to_html in (None, False, True):
             base = self.root / f"converted-{to_html}"
-            convert(source, base, read_options={"xdxf_to_html": to_html})
+            read_options = {} if to_html is None else {"xdxf_to_html": to_html}
+            convert(source, base, read_options=read_options)
             for server in ("dico", "dictd"):
                 with self.subTest(to_html=to_html, server=server):
                     output = self.query(server, base, ["DEFINE fixture reference"])
-                    self.assertIn("See apples ({apple}) and {食べる}.", output)
+                    if to_html is not True:
+                        self.assertIn("See apples ({apple}) and {食べる}.", output)
+                    else:
+                        # An explicit reader override retains its version's
+                        # whitespace behavior, but links must still survive.
+                        self.assertIn("apples ({apple})", output)
+                        self.assertIn("{食べる}", output)
 
     def test_unsafe_and_external_link_targets_preserve_labels(self):
         targets = ["https://example.com", "mailto:test@example.com", "file:///tmp/file",
