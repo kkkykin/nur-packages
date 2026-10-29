@@ -94,6 +94,8 @@ which Jitendex uses for redirects. These become DICT cross-references along
 with `?query=…` links in structured definitions. Redirects refer to their
 targets; the converter does not inline the target articles. The ZIP's
 attribution and website are preserved in `00-database-info`.
+The reader traverses term banks directly with PyGlossary 5.3 and 5.4.2,
+preserving the same redirect articles across both versions.
 
 The `dict-convert` package also provides a CLI:
 

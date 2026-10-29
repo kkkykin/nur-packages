@@ -51,7 +51,7 @@ class ConversionTests(unittest.TestCase):
         source.write_text("".join(f"{word}\t{definition}\n" for word, definition in records), encoding="utf-8")
         return source
 
-    def yomitan(self, records):
+    def yomitan(self, records, *, extra_banks=None):
         source = self.root / "jitendex-yomitan.zip"
         with zipfile.ZipFile(source, "w") as archive:
             archive.writestr("index.json", json.dumps({
@@ -61,6 +61,8 @@ class ConversionTests(unittest.TestCase):
                 "url": "https://example.com/dictionary",
             }))
             archive.writestr("term_bank_1.json", json.dumps(records, ensure_ascii=False))
+            for name, bank in (extra_banks or {}).items():
+                archive.writestr(name, json.dumps(bank, ensure_ascii=False))
         return source
 
     def index(self, base):
@@ -173,6 +175,40 @@ class ConversionTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "invalid Yomitan deinflection"):
             convert(source, base, input_format="Yomichan")
         self.assertFalse(base.with_suffix(".dict.dz").exists())
+
+    def test_yomitan_multiple_banks_preserve_redirect_articles_and_senses(self):
+        source = self.yomitan([
+            ["old", "", "", "", 0, [["target", ["old form"]]], 1, ""],
+            ["orphan", "", "", "", 0, [["missing", ["old form"]]], 2, ""],
+        ], extra_banks={
+            "term_bank_10.json": [
+                ["target", "reading", "", "", 0, ["first sense"], 3, ""],
+                ["target", "reading", "", "", 0, ["second sense"], 4, ""],
+            ],
+            "term_bank_2.json": [["mixed", "", "", "", 0, [
+                {"type": "structured-content", "content": {"tag": "a",
+                    "href": "?query=target&wildcards=off", "content": "target"}},
+                ["target", ["redirected from mixed"]],
+            ], 5, ""]],
+        })
+        base = self.root / "converted"
+        stats = convert(source, base, input_format="Yomichan")
+        self.assertEqual(stats["articles"], 5)
+        index = self.index(base)
+        self.assertEqual(index["reading"], index["target"])
+        self.assertEqual(len(index["old"]), 1)
+        self.assertNotEqual(index["old"], index["target"])
+        for server in ("dico", "dictd"):
+            with self.subTest(server=server):
+                output = self.query(server, base, ["DEFINE fixture old", "DEFINE fixture orphan",
+                    "DEFINE fixture mixed", "DEFINE fixture target", "DEFINE fixture reading"])
+                self.assertEqual(output.count("150 1 definitions"), 3)
+                self.assertEqual(output.count("150 2 definitions"), 2)
+                self.assertIn("→ {target} (old form)", output)
+                self.assertIn("→ {missing} (old form)", output)
+                self.assertIn("→ {target} (redirected from mixed)", output)
+                self.assertEqual(output.count("target\nfirst sense"), 2)
+                self.assertEqual(output.count("target\nsecond sense"), 2)
 
     def test_compression_reproducibility_and_no_runtime_python(self):
         source = self.tabfile([("go", "definition" * 10000), ("child", "small")])

@@ -26,6 +26,16 @@ def definition_html(definitions):
 
 
 class YomitanReader(Reader):
+    def __iter__(self):
+        if self._dictFile is None:
+            raise RuntimeError("Yomitan: reader is not open")
+        # PyGlossary 5.4 adds an alias prepass and changes _readTermBank's
+        # signature. Keep source redirect articles as DICT references in one
+        # pass, without inheriting that version-dependent traversal.
+        for bank in self._termBankFiles:
+            yield from self._read_term_bank(bank.filename)
+        yield from self._readUsedResources()
+
     def _readIndex(self):
         super()._readIndex()
         with self._dictFile.open("index.json") as stream:
@@ -35,7 +45,7 @@ class YomitanReader(Reader):
         if url := index.get("url"):
             self._glos.setInfo("website", url)
 
-    def _readTermBank(self, name):
+    def _read_term_bank(self, name):
         with self._dictFile.open(name) as stream:
             bank = json.load(stream)
         for item in bank:
