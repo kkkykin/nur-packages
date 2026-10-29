@@ -9,6 +9,7 @@ import subprocess
 import tempfile
 import unittest
 from unittest.mock import patch
+import zipfile
 
 from convert import convert
 from morphology import Inflections
@@ -48,6 +49,18 @@ class ConversionTests(unittest.TestCase):
     def tabfile(self, records):
         source = self.root / "source.tsv"
         source.write_text("".join(f"{word}\t{definition}\n" for word, definition in records), encoding="utf-8")
+        return source
+
+    def yomitan(self, records):
+        source = self.root / "jitendex-yomitan.zip"
+        with zipfile.ZipFile(source, "w") as archive:
+            archive.writestr("index.json", json.dumps({
+                "title": "Yomitan test", "format": 3,
+                "sourceLanguage": "ja", "targetLanguage": "en",
+                "attribution": "Test author, CC BY-SA 4.0",
+                "url": "https://example.com/dictionary",
+            }))
+            archive.writestr("term_bank_1.json", json.dumps(records, ensure_ascii=False))
         return source
 
     def index(self, base):
@@ -124,6 +137,43 @@ class ConversionTests(unittest.TestCase):
                 self.assertIn('fixture "Apple"', output)
         self.assertEqual(len(self.index(base)["apple"]), 2)
 
+    def test_yomitan_structured_content_readings_redirects_and_attribution(self):
+        source = self.yomitan([
+            ["食べる", "たべる", "", "v1", 0, [{"type": "structured-content", "content": [
+                {"tag": "div", "content": "to eat"},
+                {"tag": "div", "content": {"tag": "a",
+                    "href": "?query=%E9%A3%B2%E3%82%80&wildcards=off&primary_reading=のむ",
+                    "content": "drink"}},
+            ]}], 1, ""],
+            ["食べました", "", "", "", 0, [["食べる", ["polite", "past"]]], 2, ""],
+            ["A&B", "", "", "", 0, ["symbols"], 3, ""],
+            ["alias", "", "", "", 0, [["A&B", []]], 4, ""],
+        ])
+        base = self.root / "converted"
+        stats = convert(source, base, input_format="Yomichan")
+        self.assertEqual(stats["articles"], 4)
+        self.assertEqual(self.index(base)["食べる"], self.index(base)["たべる"])
+        for server in ("dico", "dictd"):
+            with self.subTest(server=server):
+                output = self.query(server, base, ["DEFINE fixture 食べる", "DEFINE fixture たべる",
+                    "DEFINE fixture 食べました", "DEFINE fixture alias", "SHOW INFO fixture"])
+                self.assertEqual(output.count("150 1 definitions"), 4)
+                self.assertIn("to eat", output)
+                self.assertIn("drink ({飲む})", output)
+                self.assertIn("→ {食べる} (polite; past)", output)
+                self.assertIn("→ {A&B}", output)
+                self.assertIn("Test author, CC BY-SA 4.0", output)
+                self.assertIn("https://example.com/dictionary", output)
+                self.assertNotIn("?query", output)
+                self.assertNotIn("<div", output)
+
+    def test_yomitan_invalid_deinflection_fails_conversion(self):
+        source = self.yomitan([["alias", "", "", "", 0, [["target", [42]]], 1, ""]])
+        base = self.root / "bad"
+        with self.assertRaisesRegex(ValueError, "invalid Yomitan deinflection"):
+            convert(source, base, input_format="Yomichan")
+        self.assertFalse(base.with_suffix(".dict.dz").exists())
+
     def test_compression_reproducibility_and_no_runtime_python(self):
         source = self.tabfile([("go", "definition" * 10000), ("child", "small")])
         one, two = self.root / "one", self.root / "two"
@@ -183,7 +233,8 @@ class ConversionTests(unittest.TestCase):
                    "ftp://example.com", "javascript:alert(1)", "data:text/plain,test",
                    "#section", "//example.com", "bword://", "bword://bad%00word",
                    "bword://bad%0Aword", "bword://bad%7Bword%7D", "bword://%ff",
-                   "bword://" + "x" * 4097]
+                   "bword://" + "x" * 4097, "?wildcards=off", "?query=bad%00word",
+                   "?query=bad%7Bword%7D", "?query=%ff"]
         source = self.stardict([("reference", "<br>".join(
             f'<a href="{escape(target, quote=True)}">label-{i}</a>' for i, target in enumerate(targets))
             + '<br><a href="bword://apple">unfinished')])

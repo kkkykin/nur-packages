@@ -57,6 +57,44 @@ nur.lib.makeDictdDB {
 }
 ```
 
+### Yomitan / Jitendex
+
+Pass a Yomitan ZIP directly, **omit `inputFile`**, and select the PyGlossary
+format name **`Yomichan`** (also used for Yomitan). Do not unpack the ZIP or
+select `index.json`/an individual term bank.
+
+```nix
+let
+  jitendex = nur.lib.makeDictdDB {
+    src = pkgs.fetchurl {
+      url = "https://github.com/stephenmk/stephenmk.github.io/releases/download/2026.10.03.0/jitendex-yomitan.zip";
+      hash = "sha256-6RTHZZYiDf/G7gwGnNBZkvA62ymIwSw86+gXo6wnE1Y=";
+    };
+    dbName = "jitendex-jpn-eng";
+    inputFormat = "Yomichan";
+    meta.license = pkgs.lib.licenses.cc-by-sa-40;
+    # Optional: generate conjugated lookup keys such as 食べました.
+    # languages = [ "ja" ];
+  };
+in {
+  services.dictd = { enable = true; DBs = [ jitendex ]; };
+  # Or, with nur.modules.dico imported:
+  # services.dico = { enable = true; DBs = [ jitendex ]; };
+}
+```
+
+Pin a release URL and its hash: the `releases/latest/download/…` contents change
+when upstream publishes an update. A local `src = ./jitendex-yomitan.zip;` also
+works. Japanese headwords and kana readings are indexed; English translations
+are definitions, so `languages = [ "en" ]` does not add reverse English lookup.
+
+The converter includes a compatibility reader for Yomitan v3 deinflection
+references (`[term, rule-chain]`), which stock PyGlossary 5.3 cannot read and
+which Jitendex uses for redirects. These become DICT cross-references along
+with `?query=…` links in structured definitions. Redirects refer to their
+targets; the converter does not inline the target articles. The ZIP's
+attribution and website are preserved in `00-database-info`.
+
 The `dict-convert` package also provides a CLI:
 
 ```sh
@@ -64,6 +102,7 @@ dict-convert dictionary.ifo output/my-dictionary --language en --language ja
 # Select a format or its reader options when autodetection is insufficient:
 dict-convert dictionary.dsl output/my-dictionary \
   --input-format ABBYYLingvoDSL --read-options '{"encoding":"utf-8"}'
+dict-convert jitendex-yomitan.zip output/jitendex --input-format Yomichan
 ```
 
 The helper exports `dbName`, `locale`, `format = "dictd"`, `indexFile`, and
@@ -147,5 +186,6 @@ identical source data produces identical outputs.
 The converter's Nix check phase runs protocol tests against **unmodified Dico
 and dictd**. Tests cover compressed StarDict with 64-bit offsets, tab-separated
 input, synonyms, duplicate definitions, English/Japanese inflections, Unicode
-and punctuation lookup, HTML/XDXF cross-references, DICT round trips, invalid
+and punctuation lookup, Yomitan ZIPs/readings/redirects/attribution,
+HTML/XDXF cross-references, DICT round trips, invalid
 link targets, compression errors, and reproducible compressed output.

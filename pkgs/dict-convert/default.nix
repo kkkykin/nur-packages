@@ -31,6 +31,7 @@ in
       runHook preInstall
       install -Dm644 convert.py "$out/lib/dict-convert/convert.py"
       install -Dm644 morphology.py "$out/lib/dict-convert/morphology.py"
+      install -Dm644 yomitan.py "$out/lib/dict-convert/yomitan.py"
       makeWrapper ${python}/bin/python3 "$out/bin/dict-convert" \
         --add-flags "$out/lib/dict-convert/convert.py" \
         --prefix PATH : ${lib.makeBinPath [dict]}

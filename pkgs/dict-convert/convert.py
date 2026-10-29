@@ -12,7 +12,7 @@ import re
 import sqlite3
 import subprocess
 import tempfile
-from urllib.parse import unquote
+from urllib.parse import parse_qs, unquote
 
 from pyglossary import plugin_handler
 from pyglossary.glossary_v2 import Glossary as BaseGlossary
@@ -20,6 +20,7 @@ from pyglossary.plugin_lib.dictdlib import b64_decode
 from pyglossary.plugins.dict_org.writer import Writer
 
 from morphology import Inflections
+from yomitan import YomitanReader
 
 
 class Glossary(BaseGlossary):
@@ -36,6 +37,14 @@ class Glossary(BaseGlossary):
     def __init__(self, resource_dir):
         super().__init__()
         self.resource_dir = resource_dir
+
+    def _createReader(self, formatName, options):
+        if formatName == "Yomichan":
+            reader = YomitanReader(self)
+            for name, value in options.items():
+                setattr(reader, f"_{name}", value)
+            return reader
+        return super()._createReader(formatName, options)
 
     def _setTmpDataDir(self, filename):
         # PyGlossary 5.x ignores XDG_CACHE_HOME. Keep reader scratch resources
@@ -58,7 +67,10 @@ def reference_target(href):
         if target.startswith(("#", "//")) or re.match(r"[A-Za-z][A-Za-z0-9+.-]*:", target):
             return None
     try:
-        target = unquote(target, errors="strict").strip()
+        # Yomitan's internal links use ?query=term&wildcards=off rather than
+        # a bword URL. Decode the lookup key, excluding the other parameters.
+        target = (parse_qs(target[1:], errors="strict").get("query", [""])[0]
+                  if target.startswith("?") else unquote(target, errors="strict")).strip()
         validate_word(target)
     except (ValueError, UnicodeError):
         return None
