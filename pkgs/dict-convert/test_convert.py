@@ -15,6 +15,12 @@ from convert import convert
 from morphology import Inflections
 from pyglossary.plugin_lib.dictdlib import b64_decode
 
+# PyGlossary 5.5 moved this module under utils.
+try:
+    import pyglossary.utils.os_utils as os_utils
+except ModuleNotFoundError:
+    from pyglossary import os_utils
+
 
 class ConversionTests(unittest.TestCase):
     def setUp(self):
@@ -321,8 +327,9 @@ class ConversionTests(unittest.TestCase):
     def test_compression_failure_is_not_silently_accepted(self):
         source = self.tabfile([("go", "definition")])
         base = self.root / "bad"
-        with patch("pyglossary.os_utils.runDictzip"), self.assertRaisesRegex(ValueError, "did not produce dictzip"):
+        with patch.object(os_utils, "runDictzip") as compress, self.assertRaisesRegex(ValueError, "did not produce dictzip"):
             convert(source, base)
+        compress.assert_called_once()
         self.assertFalse(base.with_suffix(".index").exists())
         self.assertFalse(base.with_suffix(".dict.dz").exists())
 
