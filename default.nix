@@ -34,6 +34,7 @@
   caddy-custom = pkgs.callPackage ./pkgs/caddy-custom { };
   hubproxy = pkgs.callPackage ./pkgs/hubproxy { };
   matterbridge = pkgs.callPackage ./pkgs/matterbridge { };
+  calibre-no-speech = pkgs.callPackage ./pkgs/calibre { speechSupport = false; };
   dict-convert = pkgs.callPackage ./pkgs/dict-convert {};
   dico-stardict = pkgs.callPackage ./pkgs/dico-stardict { };
   dico-stardict-native = pkgs.callPackage ./pkgs/dico-stardict-native { };
