@@ -3,6 +3,7 @@
   buildPythonPackage,
   fetchPypi,
   lxml,
+  python,
   regex,
   setuptools,
 }:
@@ -20,9 +21,34 @@ buildPythonPackage rec {
   build-system = [setuptools lxml regex];
   dependencies = [lxml regex];
 
-  # Static rule tables must be built with the regex version used at runtime.
+  postPatch = ''
+    # Calibre requires the extension and its tables; upstream silently falls
+    # back to an extension without tables when the generator fails.
+    substituteInPlace setup.py \
+      --replace-fail \
+        "r = subprocess.run(cmd, env=dict(os.environ, PYTHONHASHSEED='0'))" \
+        "r = subprocess.run(cmd, env=dict(os.environ, PYTHONHASHSEED='0'), check=True)" \
+      --replace-fail "optional=True" "optional=False"
+  '';
+
+  # Avoid multiprocessing's shared-memory requirements in build sandboxes.
+  # Static rule tables must use the same regex version as the runtime.
   preBuild = ''
-    export LANGTOOL_RULE_TABLES_JOBS="$NIX_BUILD_CORES"
+    export LANGTOOL_RULE_TABLES_JOBS=1
+  '';
+
+  postInstall = ''
+    PYTHONPATH="$out/${python.sitePackages}:$PYTHONPATH" python - <<'PY'
+    import langtool
+    from langtool.languages import LANGUAGES
+    from langtool.patterns.static import available_languages, tables_for
+
+    assert set(available_languages()) == set(LANGUAGES), 'Missing static rule tables'
+    for code in available_languages():
+        tables = tables_for(code)
+        assert tables is not None, langtool.static_rules_status()
+        assert tables.regex_programs_usable(), f'Incompatible regex rule tables for {code}'
+    PY
   '';
 
   pythonImportsCheck = ["langtool" "langtool._speedups"];
