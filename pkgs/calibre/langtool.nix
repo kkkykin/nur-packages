@@ -2,12 +2,25 @@
   lib,
   buildPythonPackage,
   fetchPypi,
+  fetchurl,
   lxml,
   python,
   regex,
   setuptools,
-}:
-buildPythonPackage rec {
+}: let
+  # Rule generation initializes the ca/de multitoken spellers. These resources
+  # are not in the sdist; versions and hashes come from dictionaries.json.
+  ruleTableDictionaries = [
+    (fetchurl {
+      url = "https://repo.maven.apache.org/maven2/org/languagetool/language-de/6.8/language-de-6.8.jar";
+      hash = "sha256-1DKKGc1aHMDts19xQRwJdtuVaBoR5h2u+XYM7dv7uhE=";
+    })
+    (fetchurl {
+      url = "https://repo.maven.apache.org/maven2/org/softcatala/catalan-pos-dict/3.3/catalan-pos-dict-3.3.jar";
+      hash = "sha256-5fMqrdGFLo5EKBBhHYmQbAY2mpTSpiwaFC6z6PW9ovE=";
+    })
+  ];
+in buildPythonPackage rec {
   pname = "kovidgoyal-langtool";
   version = "1.3.0";
   pyproject = true;
@@ -33,7 +46,9 @@ buildPythonPackage rec {
 
   # Static rule tables must use the same regex version as the runtime.
   preBuild = ''
-    # Loading ca/de rules extracts bundled dictionary resources to this cache.
+    # Locate the prefetched JARs without downloading inside the build sandbox.
+    export LANGTOOL_DICT_PATH="${lib.concatStringsSep ":" ruleTableDictionaries}"
+    # Loading ca/de rules extracts dictionary resources from the JARs here.
     # The default cache is under Nix's unwritable HOME (/homeless-shelter).
     export LANGTOOL_CACHE_DIR="$TMPDIR/langtool-cache"
     export LANGTOOL_RULE_TABLES_JOBS="$NIX_BUILD_CORES"
