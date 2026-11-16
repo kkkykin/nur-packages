@@ -31,10 +31,12 @@ buildPythonPackage rec {
       --replace-fail "optional=True" "optional=False"
   '';
 
-  # Avoid multiprocessing's shared-memory requirements in build sandboxes.
   # Static rule tables must use the same regex version as the runtime.
   preBuild = ''
-    export LANGTOOL_RULE_TABLES_JOBS=1
+    # Loading ca/de rules extracts bundled dictionary resources to this cache.
+    # The default cache is under Nix's unwritable HOME (/homeless-shelter).
+    export LANGTOOL_CACHE_DIR="$TMPDIR/langtool-cache"
+    export LANGTOOL_RULE_TABLES_JOBS="$NIX_BUILD_CORES"
   '';
 
   postInstall = ''
