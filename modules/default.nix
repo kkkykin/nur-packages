@@ -12,12 +12,13 @@ let
     openlist = ./openlist;
     proxy-checker = ./proxy-checker;
     resin = ./resin;
+    rsshub-proxy = ./rsshub-proxy;
     srs-decompile = ./srs-decompile;
   };
 in
-modules
-// {
-  default = {
-    imports = builtins.attrValues modules;
-  };
-}
+  modules
+  // {
+    default = {
+      imports = builtins.attrValues modules;
+    };
+  }
