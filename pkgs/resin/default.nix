@@ -6,13 +6,13 @@
   nix-update-script,
 }:
 let
-  version = "1.3.0";
+  version = "1.4.1";
 
   src = fetchFromGitHub {
     owner = "Resinat";
     repo = "Resin";
     tag = "v${version}";
-    hash = "sha256-6YBI15NLupgEKwSwGy9x7JToYP7G5/7IyF+Ty5pKpQ8=";
+    hash = "sha256-L5tNfiRxKVlcHNthqSw/Ui5AOWaxCJy0KO8rKiFwKbg=";
   };
 
   # Built separately with the Nix-managed npm toolchain, then dropped into
