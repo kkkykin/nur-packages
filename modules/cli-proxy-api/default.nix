@@ -67,7 +67,7 @@ in
       wantedBy = [ "multi-user.target" ];
       after = [ "network.target" ];
 
-      serviceConfig = {
+      serviceConfig = (import ../../lib/service-hardening.nix {inherit lib;}) // {
         Type = "simple";
         User = cfg.user;
         Group = cfg.group;

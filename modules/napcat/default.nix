@@ -76,6 +76,18 @@ in
       description = "Host port for the NapCat WebUI (served at /webui).";
     };
 
+    webuiListenAddress = lib.mkOption {
+      type = lib.types.str;
+      default = "127.0.0.1";
+      description = "Host address for the published WebUI port.";
+    };
+
+    onebotListenAddress = lib.mkOption {
+      type = lib.types.str;
+      default = "127.0.0.1";
+      description = "Host address for published OneBot ports. Set explicitly for remote bridges.";
+    };
+
     onebotWsPort = lib.mkOption {
       type = lib.types.port;
       default = 3001;
@@ -193,20 +205,25 @@ in
         ];
 
         ports = lib.optionals cfg.publishPorts [
-          "${toString cfg.webuiPort}:6099"
-          "${toString cfg.onebotWsPort}:3001"
-          "${toString cfg.onebotHttpPort}:3000"
+          "${cfg.webuiListenAddress}:${toString cfg.webuiPort}:6099"
+          "${cfg.onebotListenAddress}:${toString cfg.onebotWsPort}:3001"
+          "${cfg.onebotListenAddress}:${toString cfg.onebotHttpPort}:3000"
         ];
 
         # NapCat needs SYS_PTRACE and seccomp unconfined.
         capabilities = {
           SYS_PTRACE = true;
+          NET_RAW = false;
+          MKNOD = false;
+          SETFCAP = false;
+          AUDIT_WRITE = false;
         } // cfg.capabilities;
 
         # Restart is managed by systemd (oci-containers adds --rm), so extraOptions
         # only carries user-supplied options plus NapCat's required seccomp opt.
         extraOptions =
-          cfg.extraOptions
+          [ "--security-opt=no-new-privileges=true" "--pids-limit=512" ]
+          ++ cfg.extraOptions
           ++ [ "--security-opt=seccomp=unconfined" ];
       };
     };

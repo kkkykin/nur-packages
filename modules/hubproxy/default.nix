@@ -2,6 +2,7 @@
 
 let
   cfg = config.services.hubproxy;
+  hardening = import ../../lib/service-hardening.nix {inherit lib;};
 
   tomlFormat = pkgs.formats.toml { };
 
@@ -246,11 +247,12 @@ in
           environment = cfg.environment;
           path = cfg.path;
 
-          serviceConfig = ({
+          serviceConfig = (hardening // {
             Type = "simple";
             User = cfg.user;
             Group = cfg.group;
             WorkingDirectory = cfg.dataDir;
+            ReadWritePaths = [ cfg.dataDir ];
 
             Restart = "always";
             RestartSec = 5;

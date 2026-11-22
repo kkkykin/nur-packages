@@ -107,7 +107,7 @@ in {
       # Reloading the complete Caddyfile needs the same environment, including
       # DNS-provider credentials and any placeholders used elsewhere in it.
       inherit (config.systemd.services.caddy) environment;
-      serviceConfig = {
+      serviceConfig = (import ../../lib/service-hardening.nix {inherit lib;}) // {
         Type = "oneshot";
         User = caddy.user;
         Group = caddy.group;

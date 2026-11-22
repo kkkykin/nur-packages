@@ -34,3 +34,34 @@ Uncomment this if you use travis:
 [![Build Status](https://travis-ci.com/<YOUR_TRAVIS_USERNAME>/nur-packages.svg?branch=master)](https://travis-ci.com/<YOUR_TRAVIS_USERNAME>/nur-packages)
 -->
 [![Cachix Cache](https://img.shields.io/badge/cachix-<YOUR_CACHIX_CACHE_NAME>-blue.svg)](https://<YOUR_CACHIX_CACHE_NAME>.cachix.org)
+
+## Service hardening
+
+Application modules use `lib/service-hardening.nix` for overridable systemd
+defaults: no privilege escalation or capabilities, a read-only filesystem,
+private temporary files, and restricted access to homes, devices and kernel
+settings. Each module allows its own writable state directories. Custom mounts
+and shared data must be declared through `systemd.services.<name>.serviceConfig`;
+normal option definitions override the hardening defaults. JIT memory and
+syscall filters are intentionally left to individual services.
+
+For consumers of `default.nix`, the same defaults are available as
+`pkgs.kkkykin.lib.serviceHardening`. OpenList keeps group-writable state for shared
+file access and supports a custom `dataDir`; hubproxy's `serviceConfig` option can
+override its defaults.
+
+Published NapCat and matrix-pylon ports default to `127.0.0.1`. Use
+`services.napcat.webuiListenAddress`, `services.napcat.onebotListenAddress`, or
+`services.matrix-pylon.listenAddress` to allow remote clients explicitly.
+Containers drop unnecessary capabilities, enable no-new-privileges and limit
+process counts. NapCat retains `SYS_PTRACE` and unconfined seccomp because QQ
+instrumentation requires them.
+
+Module interface and generated-unit regressions can be evaluated without
+building the application packages:
+
+```sh
+nix eval --impure --json --expr 'import ./tests/service-hardening.nix {
+  nixpkgs = (builtins.getFlake (toString ./.)).inputs.nixpkgs.outPath;
+}'
+```

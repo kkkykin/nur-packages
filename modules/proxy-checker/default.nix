@@ -71,7 +71,7 @@ in {
         PORT = toString cfg.port;
       } // cfg.settings;
 
-      serviceConfig = {
+      serviceConfig = (import ../../lib/service-hardening.nix {inherit lib;}) // {
         Type = "simple";
         User = "proxy-checker";
         Group = "proxy-checker";

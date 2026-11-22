@@ -70,6 +70,12 @@ in
       '';
     };
 
+    listenAddress = lib.mkOption {
+      type = lib.types.str;
+      default = "127.0.0.1";
+      description = "Host address for the published appservice port.";
+    };
+
     containerUid = lib.mkOption {
       type = lib.types.int;
       default = 1337;
@@ -149,9 +155,15 @@ in
           "${cfg.dataDir}:/data"
         ];
 
-        ports = lib.optional cfg.publishPort "${toString cfg.listenPort}:${toString cfg.listenPort}";
+        ports = lib.optional cfg.publishPort "${cfg.listenAddress}:${toString cfg.listenPort}:${toString cfg.listenPort}";
 
-        extraOptions = cfg.extraOptions;
+        capabilities = {
+          NET_RAW = false;
+          MKNOD = false;
+          SETFCAP = false;
+          AUDIT_WRITE = false;
+        };
+        extraOptions = [ "--security-opt=no-new-privileges=true" "--pids-limit=512" ] ++ cfg.extraOptions;
       };
     };
 

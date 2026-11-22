@@ -123,7 +123,7 @@ in
       # 让 PATH 里有基础命令（尽量少依赖环境）
       path = with pkgs; [ coreutils curl jq sing-box gawk gnugrep gnused ];
 
-      serviceConfig = {
+      serviceConfig = (import ../../lib/service-hardening.nix {inherit lib;}) // {
         Type = "oneshot";
         User = cfg.user;
         Group = cfg.group;

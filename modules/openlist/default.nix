@@ -2,6 +2,7 @@
 with lib;
 let
   cfg = config.services.openlist;
+  hardening = import ../../lib/service-hardening.nix {inherit lib;};
 in {
   options.services.openlist = {
     enable = mkEnableOption "openlist daemon";
@@ -21,7 +22,7 @@ in {
     envFile = mkOption {
       type = types.nullOr types.path;
       default = null;
-      example = literalExpression "./files/myenv";
+      example = "/run/secrets/openlist";
       description = "Environment file (KEY=value) passed to systemd";
     };
 
@@ -44,16 +45,22 @@ in {
       wantedBy    = [ "multi-user.target" ];
       after       = [ "network.target" ];
 
-      serviceConfig = {
+      serviceConfig = hardening // {
         User             = cfg.user;
         Group            = cfg.user;
-        StateDirectory   = baseNameOf cfg.dataDir;
+        StateDirectory   = mkIf (cfg.dataDir == "/var/lib/openlist") "openlist";
+        StateDirectoryMode = "0770";
         WorkingDirectory = cfg.dataDir;
         ExecStart        = "${cfg.package}/bin/OpenList server --data ${cfg.dataDir}";
         Restart          = "on-failure";
         EnvironmentFile  = mkIf (cfg.envFile != null) cfg.envFile;
         UMask            = "0002";
+        ReadWritePaths   = [ cfg.dataDir ];
       };
     };
+
+    systemd.tmpfiles.rules = [
+      "d ${cfg.dataDir} 0770 ${cfg.user} ${cfg.user} -"
+    ];
   };
 }

@@ -116,7 +116,7 @@ in {
         RESIN_PROXY_BYPASS = cfg.proxyBypass;
       } // cfg.settings;
 
-      serviceConfig = {
+      serviceConfig = (import ../../lib/service-hardening.nix {inherit lib;}) // {
         Type = "simple";
         User = "resin";
         Group = "resin";

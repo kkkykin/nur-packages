@@ -145,7 +145,7 @@ in {
       description = "GNU Dico Dictionary Server";
       wantedBy = ["multi-user.target"];
       after = ["network.target"];
-      serviceConfig = {
+      serviceConfig = (import ../../lib/service-hardening.nix {inherit lib;}) // {
         Type = "simple";
         ExecStart = "${cfg.package}/bin/dicod --foreground --stderr --config=${configFile}";
         DynamicUser = true;

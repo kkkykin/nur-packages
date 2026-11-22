@@ -74,7 +74,7 @@ in
         USAGE_DATA_DIR = cfg.dataDir;
       } // cfg.settings;
 
-      serviceConfig = {
+      serviceConfig = (import ../../lib/service-hardening.nix {inherit lib;}) // {
         Type = "simple";
         User = "cpa-manager-plus";
         Group = "cpa-manager-plus";
